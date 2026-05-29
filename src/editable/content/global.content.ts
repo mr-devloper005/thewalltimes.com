@@ -3,34 +3,34 @@ import { slot4BrandConfig } from '@/editable/theme/brand.config'
 export const globalContent = {
   site: {
     name: slot4BrandConfig.siteName,
-    tagline: slot4BrandConfig.tagline || 'Independent reading platform',
+    tagline: slot4BrandConfig.tagline || 'Independent article newsroom',
     domain: slot4BrandConfig.domain,
     baseUrl: slot4BrandConfig.baseUrl,
   },
   nav: {
-    tagline: 'Independent reading platform',
+    tagline: slot4BrandConfig.tagline || 'Article newsroom',
     primaryLinks: [
-      { label: 'Articles', href: '/articles' },
-      { label: 'Visuals', href: '/image-sharing' },
-      { label: 'Listings', href: '/listings' },
+      { label: 'Articles', href: '/article' },
+      { label: 'Search', href: '/search' },
+      { label: 'About', href: '/about' },
       { label: 'Contact', href: '/contact' },
     ],
     actions: {
-      primary: { label: 'Start exploring', href: '/' },
-      secondary: { label: 'Submit', href: '/contact' },
+      primary: { label: 'Read latest', href: '/article' },
+      secondary: { label: 'Pitch a story', href: '/contact' },
     },
   },
   footer: {
-    tagline: 'Stories, resources, and discoverable posts',
-    description: 'A connected publishing surface for articles, visuals, listings, profiles, bookmarks, and downloadable resources.',
+    tagline: 'Articles, analysis, essays, and useful context',
+    description: 'A modern article-first publication for readers who want sharp headlines, calm layouts, useful context, and an archive that stays easy to scan.',
     columns: [
       {
         title: 'Explore',
         links: [
-          { label: 'Articles', href: '/articles' },
-          { label: 'Listings', href: '/listings' },
-          { label: 'Images', href: '/image-sharing' },
-          { label: 'PDF Library', href: '/pdf' },
+          { label: 'Latest Articles', href: '/article' },
+          { label: 'Search Archive', href: '/search' },
+          { label: 'Reader Notes', href: '/comments' },
+          { label: 'Bookmarks', href: '/sbm' },
         ],
       },
       {
@@ -41,7 +41,7 @@ export const globalContent = {
         ],
       },
     ],
-    bottomNote: 'Built for clean discovery and connected publishing.',
+    bottomNote: 'Built for clean reading, fast discovery, and editorial trust.',
   },
   commonLabels: {
     readMore: 'Read more',
