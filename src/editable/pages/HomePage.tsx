@@ -4,9 +4,10 @@ import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import { buildPageMetadata } from '@/lib/seo'
 import { fetchHomeTaskFeed, fetchHomeTimeSections, type HomeTimeSection } from '@/lib/task-data'
 import { pagesContent } from '@/editable/content/pages.content'
-import { editableDesignContract as dc } from '@/editable/layouts/design-contract'
+import { globalContent } from '@/editable/content/global.content'
 import type { SitePost } from '@/lib/site-connector'
 import { EditableHomeCta, EditableHomeHero, EditableMagazineSplit, EditableStoryRail, EditableTimeCollections } from '@/editable/sections/HomeSections'
+import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 
 export const revalidate = 300
 
@@ -37,12 +38,13 @@ export default async function HomePage() {
   const baseUrl = SITE_CONFIG.baseUrl.replace(/\/$/, '')
 
   return (
-    <main className={dc.shell.page}>
+    <EditableSiteShell>
+      <main>
       <SchemaJsonLd
         data={{
           '@context': 'https://schema.org',
           '@type': 'WebSite',
-          name: SITE_CONFIG.name,
+          name: globalContent.site.name,
           url: baseUrl,
           potentialAction: {
             '@type': 'SearchAction',
@@ -56,6 +58,7 @@ export default async function HomePage() {
       <EditableMagazineSplit primaryTask={primaryTask} primaryRoute={primaryRoute} posts={primaryPosts} timeSections={timeSections} />
       <EditableTimeCollections primaryTask={primaryTask} primaryRoute={primaryRoute} posts={primaryPosts} timeSections={timeSections} />
       <EditableHomeCta />
-    </main>
+      </main>
+    </EditableSiteShell>
   )
 }
