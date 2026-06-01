@@ -1,46 +1,28 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Bookmark, PenLine, Search } from 'lucide-react'
 import { buildPageMetadata } from '@/lib/seo'
-import { globalContent } from '@/editable/content/global.content'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { EditableLocalSignupForm } from '@/editable/components/EditableLocalAuthForms'
+import { pagesContent } from '@/editable/content/pages.content'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildPageMetadata({ path: '/signup', title: 'Sign up', description: 'Create a local reader account.' })
+  return buildPageMetadata({ path: '/signup', title: 'Sign up', description: pagesContent.auth.signup.metadataDescription })
 }
 
 export default function SignupPage() {
   return (
     <EditableSiteShell>
-      <main className="bg-[#0b0b0e] text-white">
-        <section className="mx-auto grid min-h-[calc(100vh-10rem)] max-w-[var(--editable-container)] items-center gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[0.9fr_1fr] lg:px-8 lg:py-14">
-          <div className="rounded-[1.25rem] border border-white/10 bg-white p-6 text-black shadow-[0_18px_52px_rgba(0,0,0,0.28)] sm:p-8">
-            <p className="text-xs font-black uppercase text-[var(--slot4-accent-fill)]">Create profile</p>
-            <h1 className="mt-3 text-3xl font-black">Join the article desk</h1>
-            <p className="mt-3 text-sm leading-7 text-black/58">Create a profile to personalize the navbar and test the reader journey.</p>
+      <main className="bg-[var(--editable-page-text,#2f1d16)] text-[var(--editable-page-bg,#fff4e4)]">
+        <section className="mx-auto grid min-h-[calc(100vh-12rem)] max-w-[var(--editable-container)] items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[0.9fr_1fr] lg:px-8">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.08] p-6 shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur sm:p-8">
+            <h1 className="text-3xl font-black tracking-[-0.05em]">{pagesContent.auth.signup.formTitle}</h1>
             <EditableLocalSignupForm />
-            <p className="mt-5 text-sm text-black/60">Already have an account? <Link href="/login" className="font-black text-[var(--slot4-accent-fill)] underline-offset-4 hover:underline">Login</Link></p>
+            <p className="mt-5 text-sm text-white/65">Already have an account? <Link href="/login" className="font-black text-white underline-offset-4 hover:underline">{pagesContent.auth.signup.loginCta}</Link></p>
           </div>
           <div>
-            <p className="text-xs font-black uppercase text-[var(--slot4-accent-soft)]">Reader membership</p>
-            <h2 className="mt-5 max-w-2xl text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Make the publication feel like yours.</h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/62">
-              {globalContent.site.name} is article-first: quick discovery, confident headlines, and a clean archive. Your account lets the UI respond after sign up without changing backend logic.
-            </p>
-            <div className="mt-9 grid max-w-2xl gap-4 sm:grid-cols-3">
-              {[
-                { Icon: PenLine, title: 'Pitch', body: 'Send story ideas through contact.' },
-                { Icon: Search, title: 'Search', body: 'Find articles by topic or phrase.' },
-                { Icon: Bookmark, title: 'Return', body: 'Keep the reading path familiar.' },
-              ].map(({ Icon, title, body }) => (
-                <div key={title} className="rounded-[1.25rem] border border-white/10 bg-white/[0.07] p-4">
-                  <Icon className="h-5 w-5 text-[var(--slot4-accent-soft)]" />
-                  <h3 className="mt-4 text-lg font-black">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-white/58">{body}</p>
-                </div>
-              ))}
-            </div>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/60">{pagesContent.auth.signup.badge}</p>
+            <h2 className="mt-5 max-w-xl text-5xl font-black leading-[0.98] tracking-[-0.07em] sm:text-6xl">{pagesContent.auth.signup.title}</h2>
+            <p className="mt-6 max-w-lg text-sm leading-8 text-white/68">{pagesContent.auth.signup.description}</p>
           </div>
         </section>
       </main>

@@ -1,13 +1,11 @@
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Bookmark, Building2, Camera, CheckCircle2, Download, ExternalLink, FileText, Globe2, Mail, MapPin, MessageCircle, Newspaper, Phone, Tag, UserRound } from 'lucide-react'
+import { ArrowLeft, Bookmark, Building2, Camera, CheckCircle2, Download, ExternalLink, FileText, Globe2, Mail, MapPin, MessageCircle, Phone, Tag, UserRound } from 'lucide-react'
 import { buildPostMetadata, buildTaskMetadata } from '@/lib/seo'
 import { buildPostUrl, fetchArticleComments, fetchTaskPostBySlug, fetchTaskPosts } from '@/lib/task-data'
-import { getTaskConfig, type TaskKey } from '@/lib/site-config'
+import { getTaskConfig, SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import type { SitePost } from '@/lib/site-connector'
-import { EditableShareButtons } from '@/editable/components/EditableShareButtons'
-import { globalContent } from '@/editable/content/global.content'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { getVisualPreset, visualSystem } from '@/editable/theme/visual-system'
 
@@ -56,15 +54,47 @@ const getBody = (post: SitePost) => {
   return asText(content.body) || asText(content.description) || asText(content.details) || post.summary || 'Details will appear here once available.'
 }
 
+const escapeHtml = (value: string) => value
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;')
+
+const safeUrl = (value: string) => /^https?:\/\//i.test(value) ? value : '#'
+
+const linkifyMarkdown = (value: string) => value
+  .replace(/\[([^\]]+)]\((https?:\/\/[^\s)]+)\)/gi, (_match, label, url) => `<a href="${safeUrl(url)}" target="_blank" rel="nofollow noopener noreferrer">${label}</a>`)
+
+const linkifyText = (value: string) => linkifyMarkdown(value)
+  .replace(/(^|[\s(>])((https?:\/\/)[^\s<)]+)/gi, (_match, prefix, url) => `${prefix}<a href="${safeUrl(url)}" target="_blank" rel="nofollow noopener noreferrer">${url}</a>`)
+
+const hardenLinks = (html: string) => html.replace(/<a\s+([^>]*href=["'][^"']+["'][^>]*)>/gi, (_match, attrs) => {
+  let next = String(attrs).replace(/\s+on\w+=("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+  if (!/\starget=/i.test(next)) next += ' target="_blank"'
+  if (!/\srel=/i.test(next)) next += ' rel="nofollow noopener noreferrer"'
+  return `<a ${next}>`
+})
+
+const sanitizeHtml = (html: string) => hardenLinks(html
+  .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+  .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+  .replace(/<(iframe|object|embed)[^>]*>[\s\S]*?<\/\1>/gi, '')
+  .replace(/\s+on\w+=("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+  .replace(/(href|src)=(['"])javascript:[\s\S]*?\2/gi, '$1="#"'))
+
 const formatPlainText = (raw: string) => {
-  if (/<[a-z][\s\S]*>/i.test(raw)) return raw.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-  return raw.split(/\n{2,}/).map((part) => `<p>${part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('')
+  const value = raw.trim()
+  if (!value) return ''
+  if (/<[a-z][\s\S]*>/i.test(value)) return sanitizeHtml(linkifyMarkdown(value))
+  return value
+    .split(/\n{2,}/)
+    .map((part) => `<p>${linkifyText(escapeHtml(part).replace(/\n/g, '<br />'))}</p>`)
+    .join('')
 }
 
 const summaryText = (post: SitePost) => post.summary || asText(getContent(post).description) || asText(getContent(post).excerpt) || ''
 const categoryOf = (post: SitePost, fallback: string) => asText(getContent(post).category) || post.tags?.[0] || fallback
-const authorOf = (post: SitePost) => getField(post, ['author', 'authorName', 'writer', 'name']) || 'Editorial Desk'
-const captionOf = (post: SitePost) => getField(post, ['caption', 'imageCaption', 'photoCaption']) || 'Image accompanying this article.'
 const mapSrcFor = (post: SitePost) => {
   const address = getField(post, ['address', 'location', 'city'])
   const lat = getField(post, ['lat', 'latitude'])
@@ -104,43 +134,17 @@ function BackLink({ task }: { task: TaskKey }) {
 
 function ArticleDetail({ post, related, comments }: { post: SitePost; related: SitePost[]; comments: Array<{ id: string; name: string; comment: string; createdAt: string }> }) {
   const images = getImages(post)
-  const taskConfig = getTaskConfig('article')
-  const category = categoryOf(post, 'Article')
   return (
-    <section className="mx-auto grid max-w-[var(--editable-container)] gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,760px)_280px] lg:px-8 lg:py-12">
-      <article className="min-w-0">
-        <nav className="border-y border-black/15 py-3 text-[11px] font-black uppercase text-black/55">
-          <Link href="/" className="text-black hover:text-[var(--detail-accent)]">Home</Link>
-          <span className="mx-2">/</span>
-          <Link href={taskConfig?.route || '/article'} className="text-black hover:text-[var(--detail-accent)]">{taskConfig?.label || 'Articles'}</Link>
-          <span className="mx-2">/</span>
-          <span className="line-clamp-1 inline align-bottom">{post.title}</span>
-        </nav>
-
-        <header className="pt-8">
-          <p className="text-xs font-black uppercase text-[var(--detail-accent)]">{category}</p>
-          <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight text-black sm:text-5xl">{post.title}</h1>
-          <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-bold text-black/58">
-            <span className="inline-flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-black text-[10px] text-white">{authorOf(post).slice(0, 1).toUpperCase()}</span>
-              {authorOf(post)}
-            </span>
-          </div>
-          <EditableShareButtons title={post.title} />
-        </header>
-
-        {images[0] ? (
-          <figure className="mt-8">
-            <img src={images[0]} alt="" className="max-h-[540px] w-full rounded-[0.35rem] object-cover ring-1 ring-black/10" />
-            <figcaption className="mt-2 text-xs italic leading-5 text-black/55">{captionOf(post)}</figcaption>
-          </figure>
-        ) : null}
-
+    <section className="mx-auto grid max-w-[var(--editable-container)] gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_350px] lg:px-8 lg:py-16">
+      <article className="min-w-0 rounded-[2.7rem] border border-[var(--editable-border)] bg-[var(--detail-surface)] p-5 shadow-[0_30px_90px_rgba(15,23,42,0.09)] sm:p-8 lg:p-12">
+        <BackLink task="article" />
+        <p className="mt-8 text-xs font-black uppercase tracking-[0.28em] text-[var(--detail-accent)]">{categoryOf(post, 'Article')}</p>
+        <h1 className="mt-4 text-4xl font-black leading-[0.98] tracking-[-0.07em] sm:text-5xl lg:text-7xl">{post.title}</h1>
+        {images[0] ? <img src={images[0]} alt="" className="mt-8 max-h-[620px] w-full rounded-[2rem] object-cover" /> : null}
         <BodyContent post={post} />
-        <ImageStrip images={images.slice(1)} label="More from this story" large />
         <EditableComments slug={post.slug} comments={comments} />
       </article>
-      <ArticleSidebar task="article" post={post} related={related} />
+      <RelatedPanel task="article" post={post} related={related} />
     </section>
   )
 }
@@ -314,7 +318,7 @@ function ProfileDetail({ post, related }: { post: SitePost; related: SitePost[] 
 }
 
 function BodyContent({ post, compact = false }: { post: SitePost; compact?: boolean }) {
-  return <div className={`article-content mt-8 max-w-none ${compact ? 'text-base leading-8' : 'text-[1.05rem] leading-8'} text-black/88`} dangerouslySetInnerHTML={{ __html: formatPlainText(getBody(post)) }} />
+  return <div className={`article-content mt-8 max-w-none ${compact ? 'text-base leading-8' : 'text-lg leading-9'} opacity-80`} dangerouslySetInnerHTML={{ __html: formatPlainText(getBody(post)) }} />
 }
 
 function InfoGrid({ items }: { items: Array<[string, string, typeof MapPin]> }) {
@@ -380,7 +384,7 @@ function RelatedPanel({ task, post, related, compact = false }: { task: TaskKey;
           <p className="text-xs font-black uppercase tracking-[0.22em] opacity-55">About this post</p>
           <div className="mt-4 grid gap-3 text-sm font-bold opacity-75">
             <p className="inline-flex items-center gap-2"><Tag className="h-4 w-4" /> Task: {taskConfig?.label || task}</p>
-            <p className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4" /> Site: {globalContent.site.name}</p>
+            <p className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4" /> Site: {SITE_CONFIG.name}</p>
             {post.publishedAt ? <p>Published: {new Date(post.publishedAt).toLocaleDateString()}</p> : null}
           </div>
         </div>
@@ -397,55 +401,6 @@ function RelatedPanel({ task, post, related, compact = false }: { task: TaskKey;
         </div>
       ) : null}
     </aside>
-  )
-}
-
-function ArticleSidebar({ task, post, related }: { task: TaskKey; post: SitePost; related: SitePost[] }) {
-  return (
-    <aside className="min-w-0 space-y-7 lg:sticky lg:top-24 lg:self-start">
-      <NewsletterBox />
-      <AdBox />
-      <RelatedPanel task={task} post={post} related={related} compact />
-    </aside>
-  )
-}
-
-function NewsletterBox() {
-  return (
-    <section className="rounded-[0.4rem] bg-black/[0.04] p-6 text-center">
-      <Newspaper className="mx-auto h-7 w-7 text-[var(--detail-accent)]" />
-      <h2 className="mt-4 text-base font-black leading-tight">Stay Informed With the Latest & Most Important News</h2>
-      <form action="/search" className="mt-5">
-        <input name="q" placeholder="Your email address" className="h-10 w-full border-b border-black bg-transparent text-center text-xs font-bold outline-none placeholder:text-black/45" />
-        <button className="mt-4 h-9 w-full rounded-full bg-black text-xs font-black uppercase text-white">Subscribe</button>
-      </form>
-      <p className="mt-4 text-[11px] leading-4 text-black/50">I consent to receive newsletter via email. For further information, please review our Privacy Policy.</p>
-    </section>
-  )
-}
-
-function AdBox() {
-  return (
-    <section className="rounded-[0.4rem] bg-black/[0.04] p-3">
-      <p className="mb-2 text-[10px] font-black uppercase text-black/45">Advertisement</p>
-      <div className="overflow-hidden rounded-[0.25rem] bg-[#11131f] p-5 text-white">
-        <div className="flex items-center gap-2">
-          <span className="h-6 w-6 rounded-full bg-[var(--detail-accent)]" />
-          <span className="text-xl font-black uppercase">{globalContent.site.name}</span>
-        </div>
-        <h3 className="mt-8 text-2xl font-black leading-tight">Modern article and magazine experience</h3>
-        <div className="mt-8 rounded bg-white p-2 shadow-2xl">
-          <div className="grid aspect-[4/3] grid-cols-3 gap-1 bg-[#f4f4f1] p-1">
-            <div className="col-span-2 bg-black/80" />
-            <div className="grid gap-1">
-              <span className="bg-black/20" />
-              <span className="bg-black/20" />
-              <span className="bg-black/20" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   )
 }
 
