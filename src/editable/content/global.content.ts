@@ -3,12 +3,12 @@ import { slot4BrandConfig } from '@/editable/theme/brand.config'
 export const globalContent = {
   site: {
     name: slot4BrandConfig.siteName,
-    tagline: slot4BrandConfig.tagline || 'Independent article newsroom',
+    tagline: slot4BrandConfig.tagline || 'Business intelligence chronicle',
     domain: slot4BrandConfig.domain,
     baseUrl: slot4BrandConfig.baseUrl,
   },
   nav: {
-    tagline: slot4BrandConfig.tagline || 'Article newsroom',
+    tagline: slot4BrandConfig.tagline || 'Chronicle',
     primaryLinks: [
       { label: 'Articles', href: '/article' },
       { label: 'Search', href: '/search' },
@@ -17,12 +17,12 @@ export const globalContent = {
     ],
     actions: {
       primary: { label: 'Read latest', href: '/article' },
-      secondary: { label: 'Pitch a story', href: '/contact' },
+      secondary: { label: 'Submit a story', href: '/contact' },
     },
   },
   footer: {
-    tagline: 'Articles, analysis, essays, and useful context',
-    description: 'A modern article-first publication for readers who want sharp headlines, calm layouts, useful context, and an archive that stays easy to scan.',
+    tagline: 'Business insights, market analysis, and strategic thinking',
+    description: 'A premium publication delivering sharp business analysis, market insights, and strategic perspectives for decision makers who value depth over noise.',
     columns: [
       {
         title: 'Explore',
@@ -41,7 +41,7 @@ export const globalContent = {
         ],
       },
     ],
-    bottomNote: 'Built for clean reading, fast discovery, and editorial trust.',
+    bottomNote: 'Premium business intelligence for discerning readers.',
   },
   commonLabels: {
     readMore: 'Read more',

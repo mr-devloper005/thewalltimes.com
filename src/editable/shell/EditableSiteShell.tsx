@@ -5,7 +5,7 @@ import { EditableFooter } from '@/editable/shell/EditableFooter'
 import { editableDesignContract as dc } from '@/editable/layouts/design-contract'
 
 export function EditableSiteShell({ children, className = '' }: { children: ReactNode; className?: string }) {
-  const shellVars = { '--editable-container': '1180px', '--editable-border': 'rgba(0,0,0,0.10)' } as CSSProperties
+  const shellVars = { '--editable-container': '1180px', '--editable-border': 'rgba(196,30,58,0.15)' } as CSSProperties
 
   return (
     <div style={shellVars} className={`${dc.shell.page} flex min-h-screen flex-col ${className}`}>
