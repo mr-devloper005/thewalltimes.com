@@ -22,14 +22,14 @@ export function EditableShareButtons({ title }: { title: string }) {
   }
 
   return (
-    <div className="mt-5 inline-flex overflow-hidden rounded-full border border-black/15 bg-white shadow-sm">
-      <span className="border-r border-black/10 px-4 py-2 text-[10px] font-black uppercase text-black/55">Share</span>
+    <div className="mt-5 inline-flex overflow-hidden border border-[#c41e3a]/20 bg-[#14141a]">
+      <span className="border-r border-[#c41e3a]/15 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#c41e3a]">Share</span>
       <a
         href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
         target="_blank"
         rel="noreferrer"
         aria-label="Share on Facebook"
-        className="flex h-9 w-9 items-center justify-center border-r border-black/10 text-black hover:bg-black hover:text-white"
+        className="flex h-9 w-9 items-center justify-center border-r border-[#c41e3a]/15 text-[#8a7f75] hover:bg-[#c41e3a]/10 hover:text-[#c41e3a]"
       >
         <Facebook className="h-4 w-4" />
       </a>
@@ -38,14 +38,14 @@ export function EditableShareButtons({ title }: { title: string }) {
         target="_blank"
         rel="noreferrer"
         aria-label="Share on X"
-        className="flex h-9 w-9 items-center justify-center border-r border-black/10 text-xs font-black text-black hover:bg-black hover:text-white"
+        className="flex h-9 w-9 items-center justify-center border-r border-[#c41e3a]/15 text-xs font-bold text-[#8a7f75] hover:bg-[#c41e3a]/10 hover:text-[#c41e3a]"
       >
         X
       </a>
       <a
         href={`mailto:?subject=${encodedTitle}&body=${encodeURIComponent(`${title}\n\n${shareUrl}`)}`}
         aria-label="Share by email"
-        className="flex h-9 w-9 items-center justify-center border-r border-black/10 text-black hover:bg-black hover:text-white"
+        className="flex h-9 w-9 items-center justify-center border-r border-[#c41e3a]/15 text-[#8a7f75] hover:bg-[#c41e3a]/10 hover:text-[#c41e3a]"
       >
         <Mail className="h-4 w-4" />
       </a>
@@ -53,7 +53,7 @@ export function EditableShareButtons({ title }: { title: string }) {
         type="button"
         onClick={copyLink}
         aria-label="Copy link"
-        className="flex h-9 w-9 items-center justify-center text-black hover:bg-black hover:text-white"
+        className="flex h-9 w-9 items-center justify-center text-[#8a7f75] hover:bg-[#c41e3a]/10 hover:text-[#c41e3a]"
       >
         <Link2 className="h-4 w-4" />
       </button>
