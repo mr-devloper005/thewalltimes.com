@@ -71,7 +71,7 @@ export function EditableArticleDetailShell({ slug, post }: { slug: string; post:
       </section>
       <section className="mx-auto w-full max-w-5xl px-4 pb-16 pt-6 sm:px-6 lg:px-8 lg:pb-24">
         <div className="border border-[#c41e3a]/15 bg-[#14141a] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.4)] sm:p-8 lg:p-10">
-          <p className="text-sm leading-8 text-[#8a7f75]">{(post?.summary || `Article detail content for ${slug} will render through the editable detail page.`).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()}</p>
+          <p className="text-sm leading-8 text-[#8a7f75]">{(post?.summary || `Article detail content for ${slug} will render through the editable detail page.`).replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()}</p>
         </div>
       </section>
     </main>
